@@ -3,6 +3,8 @@
 // https://adventofcode.com/2024/day/4
 
 val lines = io.Source.fromFile("input.txt").getLines.toVector
+val height = lines.size
+val width = lines.head.size
 
 def occurrenceCount(strings: Vector[String]): Int =
   strings.map { s =>
@@ -10,8 +12,6 @@ def occurrenceCount(strings: Vector[String]): Int =
   }.sum
 
 def diagonal(strings: Vector[String]): Vector[String] =
-  val height = strings.size
-  val width = strings.head.size
   (0 until height).map { sy =>
     (sy until height).map { y => strings(y)(y - sy) }.mkString
   }.toVector ++
@@ -26,3 +26,22 @@ val total =
     occurrenceCount((diagonal(lines.map(_.reverse)))) // reverse diagonal
 
 println(total)
+
+def isXmasCrosspoint(row: Int, col: Int): Boolean =
+  if row < 1 || row >= height - 1 || col < 1 || col >= width - 1 then false
+  else if lines(row)(col) != 'A' then false
+  else if !((lines(row - 1)(col - 1) == 'M' && lines(row + 1)(col + 1) == 'S') || 
+            (lines(row - 1)(col - 1) == 'S' && lines(row + 1)(col + 1) == 'M'))
+  then false
+  else if !((lines(row - 1)(col + 1) == 'M' && lines(row + 1)(col - 1) == 'S') ||
+            (lines(row - 1)(col + 1) == 'S' && lines(row + 1)(col - 1) == 'M'))
+  then false
+  else true
+
+val total2 = (1 until height - 1).flatMap { row =>
+  (1 until width - 1).filter { col =>
+    isXmasCrosspoint(row, col)
+  }
+}.size
+
+println(total2)
