@@ -12,6 +12,7 @@ val rules = lines
 
 val predecessors = rules.toList
   .groupBy(_._2)
+  .view
   .mapValues(_.map(_._1).toSet)
   .toMap
 
@@ -26,12 +27,36 @@ def isValid(update: List[Int]): Boolean =
   valid
 
 val updates = lines.map(_.split(',').map(_.toInt).toList)
-val score = updates
-  .filter(isValid)
-  .map(update =>
-    val mid = update.size / 2
-    update(mid)
-  )
-  .sum
+val (valid, invalid) = updates.partition(isValid)
 
-println(score)
+def score(updates: Iterator[List[Int]]): Int =
+  updates
+    .map(update =>
+      val mid = update.size / 2
+      update(mid)
+    )
+    .sum
+
+println(score(valid))
+
+@scala.annotation.tailrec
+def reorder(update: List[Int]): List[Int] =
+  val validPrefixPreds = update
+    .scanLeft((Set.empty[Int], true)) {
+      case ((preds: Set[Int], valid: Boolean), page) =>
+        val stillValid = valid && !preds.contains(page)
+        (preds ++ predecessors.getOrElse(page, Set.empty), stillValid)
+    }
+    .takeWhile(_._2)
+    .map(_._1)
+
+  val offendingIdx = validPrefixPreds.size - 1
+  if offendingIdx == update.size then update
+  else
+    val offendingPage = update(offendingIdx)
+    val swappedUpdate = update
+      .updated(offendingIdx, update(offendingIdx - 1))
+      .updated(offendingIdx - 1, offendingPage)
+    reorder(swappedUpdate)
+
+println(score(invalid.map(reorder)))
