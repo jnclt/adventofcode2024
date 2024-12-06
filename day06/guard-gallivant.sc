@@ -7,7 +7,6 @@
 import scala.collection.parallel.CollectionConverters._
 
 val lines = io.Source.fromFile("input.txt").getLines.toVector
-// val lines = io.Source.fromFile("sample.txt").getLines.toVector
 val rowRange = Range(0, lines.size)
 val colRange = Range(0, lines.head.size)
 val obstacles = (for
