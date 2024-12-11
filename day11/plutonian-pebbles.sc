@@ -16,7 +16,6 @@ println(last.size)
 
 import scala.collection.mutable.Map as mMap
 
-val succs = mMap[BigInt, Seq[BigInt]](BigInt(0) -> Seq(BigInt(1)))
 val lengths = mMap[BigInt, mMap[Int, BigInt]]()
 
 def blinkRec(stop: Int)(v: BigInt): BigInt =
