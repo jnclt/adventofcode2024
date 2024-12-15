@@ -1,5 +1,7 @@
 #!/usr/bin/env -S scala-cli shebang
 
+//> using dep org.scala-lang.modules::scala-parallel-collections:1.0.4
+
 case class Pos(x: Int, y: Int):
   def +(that: Pos) = Pos(this.x + that.x, this.y + that.y)
   def *(f: Int) = Pos(this.x * f, this.y * f)
@@ -37,3 +39,15 @@ val counts = robots
   .values
   .map(_.size)
 println(counts.product)
+
+def isPattern(length: Int)(steps: Int): Boolean =
+  val ps = robots.map(at(steps).tupled)
+  val rows = ps
+    .groupBy(_.y)
+    .view
+    .mapValues(_.map(_.x).sorted.sliding(2).map(l => l.last - l.head).toList)
+  rows.values.find(_.containsSlice(Seq.fill(length)(1))).isDefined
+
+val patternStep = (1 to 10000).find(isPattern(5)) // 5 robots in a row
+
+println(patternStep)
